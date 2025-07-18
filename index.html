@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacation Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 40px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="date"],
+        input[type="number"],
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            color: #333;
+        }
+
+        .calculator input[type="text"] {
+            width: calc(100% - 20px);
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .calculator .keys button {
+            width: 23%;
+            padding: 15px;
+            margin: 1%;
+            font-size: 18px;
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .calculator .keys button.operator {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .calculator .keys button.equal {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Vacation Planner</h1>
+
+        <div>
+            <label for="joiningDate">Joining Date:</label>
+            <input type="date" id="joiningDate">
+        </div>
+
+        <div>
+            <label for="startLeaveDate">Start Leave Date:</label>
+            <input type="date" id="startLeaveDate">
+        </div>
+
+        <div>
+            <label>Allowed Vacation Days:</label>
+            <span id="allowedVacationDays" class="result">0</span>
+        </div>
+
+        <div>
+            <label for="requestedVacationDays">Requested Vacation Days:</label>
+            <input type="number" id="requestedVacationDays" min="1">
+        </div>
+
+        <div>
+            <label>Your Estimated End Date:</label>
+            <span id="endDate" class="result"></span>
+        </div>
+
+        <div>
+            <label>Balance Vacation Days:</label>
+            <span id="balanceVacationDays" class="result">0</span>
+        </div>
+
+        <button onclick="calculateVacation()">Calculate Vacation</button>
+    </div>
+
+    <div class="calculator">
+        <h2>Calculator</h2>
+        <input type="text" id="calcDisplay" readonly>
+        <div class="keys">
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equal" onclick="calculateResult()">=</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button onclick="clearDisplay()">C</button>
+        </div>
+    </div>
+
+    <script>
+        function calculateVacation() {
+            const joiningDateInput = document.getElementById('joiningDate').value;
+            const startLeaveDateInput = document.getElementById('startLeaveDate').value;
+            const requestedVacationDays = parseInt(document.getElementById('requestedVacationDays').value);
+
+            if (!joiningDateInput || !startLeaveDateInput || isNaN(requestedVacationDays)) {
+                alert('Please fill in all the required fields.');
+                return;
+            }
+
+            const joiningDate = new Date(joiningDateInput);
+            const startLeaveDate = new Date(startLeaveDateInput);
+
+            // Calculate days from joining date to start leave date
+            const timeDiff = startLeaveDate.getTime() - joiningDate.getTime();
+            const daysBetween = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+            // Calculate allowed vacation days: 30/365 * (days between)
+            const allowedDays = Math.floor((30 / 365) * daysBetween);
+            document.getElementById('allowedVacationDays').textContent = allowedDays;
+
+            // Calculate end date, excluding Fridays
+            let currentEndDate = new Date(startLeaveDate);
+            let daysCounted = 0;
+            while (daysCounted < requestedVacationDays) {
+                currentEndDate.setDate(currentEndDate.getDate() + 1); // Move to the next day
+                // 5 represents Friday (Sunday is 0, Saturday is 6)
+                if (currentEndDate.getDay() !== 5) {
+                    daysCounted++;
+                }
+            }
+            document.getElementById('endDate').textContent = currentEndDate.toDateString();
+
+            // Calculate balance vacation days
+            const balanceDays = allowedDays - requestedVacationDays;
+            document.getElementById('balanceVacationDays').textContent = balanceDays;
+        }
+
+        // Calculator functions
+        let calcDisplay = document.getElementById('calcDisplay');
+
+        function appendToDisplay(value) {
+            calcDisplay.value += value;
+        }
+
+        function clearDisplay() {
+            calcDisplay.value = '';
+        }
+
+        function calculateResult() {
+            try {
+                calcDisplay.value = eval(calcDisplay.value); // Using eval for simplicity, for production, safer parsing is recommended
+            } catch (error) {
+                calcDisplay.value = 'Error';
+            }
+        }
+    </script>
+</body>
+
+</html>
