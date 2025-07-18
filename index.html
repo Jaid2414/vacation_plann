@@ -8,34 +8,30 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
-            gap: 40px;
+            margin: 0;
+            padding: 10px;
             background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
-        .container {
+        .container, .calculator {
             background-color: #fff;
-            padding: 30px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: 100%;
+            max-width: 500px; /* Max width for larger screens */
+            box-sizing: border-box;
         }
 
-        .calculator {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-
-        h1 {
+        h1, h2 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-size: 1.5rem; /* Relative font size */
         }
 
         label {
@@ -43,27 +39,28 @@
             margin-bottom: 8px;
             color: #555;
             font-weight: bold;
+            font-size: 0.9rem;
         }
 
         input[type="date"],
         input[type="number"],
         input[type="text"] {
             width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 20px;
+            padding: 8px;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 0.9rem;
         }
 
         button {
             background-color: #007bff;
             color: white;
-            padding: 12px 20px;
+            padding: 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 0.9rem;
             width: 100%;
             margin-top: 10px;
         }
@@ -73,30 +70,38 @@
         }
 
         .result {
-            margin-top: 20px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 8px;
             background-color: #e9ecef;
             border-radius: 4px;
             border: 1px solid #ced4da;
             color: #333;
+            font-size: 0.9rem;
         }
 
         .calculator input[type="text"] {
             width: calc(100% - 20px);
             margin-bottom: 10px;
             text-align: right;
+            font-size: 1rem;
+        }
+
+        .calculator .keys {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .calculator .keys button {
-            width: 23%;
-            padding: 15px;
-            margin: 1%;
-            font-size: 18px;
+            width: 22%;
+            padding: 12px;
+            font-size: 1rem;
             background-color: #e0e0e0;
             color: #333;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            min-width: 50px; /* Ensure touch-friendly size */
         }
 
         .calculator .keys button.operator {
@@ -108,43 +113,83 @@
             background-color: #4CAF50;
             color: white;
         }
+
+        /* Media Queries for Larger Screens */
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+                justify-content: center;
+                padding: 20px;
+                gap: 40px;
+            }
+
+            .container {
+                max-width: 400px;
+                padding: 20px;
+            }
+
+            .calculator {
+                max-width: 300px;
+                padding: 20px;
+            }
+
+            h1, h2 {
+                font-size: 1.8rem;
+            }
+
+            input[type="date"],
+            input[type="number"],
+            input[type="text"],
+            button {
+                font-size: 1rem;
+                padding: 10px;
+            }
+
+            .calculator .keys button {
+                padding: 15px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 450px;
+            }
+
+            .calculator {
+                max-width: 350px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Vacation Planner</h1>
-
         <div>
             <label for="joiningDate">Joining Date:</label>
             <input type="date" id="joiningDate">
         </div>
-
         <div>
             <label for="startLeaveDate">Start Leave Date:</label>
             <input type="date" id="startLeaveDate">
         </div>
-
         <div>
             <label>Allowed Vacation Days:</label>
             <span id="allowedVacationDays" class="result">0</span>
         </div>
-
         <div>
             <label for="requestedVacationDays">Requested Vacation Days:</label>
             <input type="number" id="requestedVacationDays" min="1">
         </div>
-
         <div>
             <label>Your Estimated End Date:</label>
             <span id="endDate" class="result"></span>
         </div>
-
         <div>
             <label>Balance Vacation Days:</label>
             <span id="balanceVacationDays" class="result">0</span>
         </div>
-
         <button onclick="calculateVacation()">Calculate Vacation</button>
     </div>
 
@@ -186,32 +231,26 @@
             const joiningDate = new Date(joiningDateInput);
             const startLeaveDate = new Date(startLeaveDateInput);
 
-            // Calculate days from joining date to start leave date
             const timeDiff = startLeaveDate.getTime() - joiningDate.getTime();
             const daysBetween = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-            // Calculate allowed vacation days: 30/365 * (days between)
             const allowedDays = Math.floor((30 / 365) * daysBetween);
             document.getElementById('allowedVacationDays').textContent = allowedDays;
 
-            // Calculate end date, excluding Fridays
             let currentEndDate = new Date(startLeaveDate);
             let daysCounted = 0;
             while (daysCounted < requestedVacationDays) {
-                currentEndDate.setDate(currentEndDate.getDate() + 1); // Move to the next day
-                // 5 represents Friday (Sunday is 0, Saturday is 6)
+                currentEndDate.setDate(currentEndDate.getDate() + 1);
                 if (currentEndDate.getDay() !== 5) {
                     daysCounted++;
                 }
             }
             document.getElementById('endDate').textContent = currentEndDate.toDateString();
 
-            // Calculate balance vacation days
             const balanceDays = allowedDays - requestedVacationDays;
             document.getElementById('balanceVacationDays').textContent = balanceDays;
         }
 
-        // Calculator functions
         let calcDisplay = document.getElementById('calcDisplay');
 
         function appendToDisplay(value) {
@@ -224,7 +263,7 @@
 
         function calculateResult() {
             try {
-                calcDisplay.value = eval(calcDisplay.value); // Using eval for simplicity, for production, safer parsing is recommended
+                calcDisplay.value = eval(calcDisplay.value);
             } catch (error) {
                 calcDisplay.value = 'Error';
             }
