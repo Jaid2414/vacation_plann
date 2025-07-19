@@ -7,12 +7,11 @@
     <title>Vacation Planner</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 10px;
-            /* Gradient Background */
             background: linear-gradient(135deg, #6b9ac4 0%, #a1c4fd 100%);
-            min-height: 100vh; /* Ensure background covers full height */
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -20,20 +19,37 @@
         }
 
         .container, .calendar {
-            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent for depth */
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Stronger shadow for contrast */
+            background-color: rgba(255, 255, 255, 0.95);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(107,154,196,0.1)" fill-opacity="1" d="M0,192L48,186.7C96,181,192,171,288,186.7C384,203,480,245,576,250.7C672,256,768,224,864,213.3C960,203,1056,213,1152,202.7C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>'); /* Wave pattern */
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 12px; /* Softer corners for travel vibe */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             width: 100%;
             max-width: 500px;
             box-sizing: border-box;
+            border: 2px solid #4682b4; /* Travel-blue border */
+            position: relative;
+        }
+
+        /* Travel-themed pseudo-element for decoration */
+        .container::before, .calendar::before {
+            content: '✈️'; /* Airplane emoji for travel theme */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+            opacity: 0.3;
         }
 
         h1, h2 {
             text-align: center;
-            color: #333;
+            color: #2e5e91; /* Deep blue for travel theme */
             margin-bottom: 20px;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            font-family: 'Georgia', serif; /* Slightly elegant font */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         label {
@@ -49,34 +65,50 @@
             width: calc(100% - 22px);
             padding: 8px;
             margin-bottom: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid #4682b4;
             border-radius: 4px;
             font-size: 0.9rem;
+            background-color: rgba(255, 255, 255, 0.8);
         }
 
         button {
-            background-color: #007bff;
+            background-color: #4682b4; /* Travel-blue */
             color: white;
             padding: 10px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
             width: 100%;
             margin-top: 10px;
-            transition: background-color 0.3s; /* Smooth hover transition */
+            transition: background-color 0.3s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #2e5e91;
+            transform: translateY(-2px); /* Subtle lift effect */
+        }
+
+        button::after {
+            content: '🌴'; /* Palm tree emoji for hover */
+            position: absolute;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        button:hover::after {
+            opacity: 0.5;
         }
 
         .result {
             margin-top: 15px;
             padding: 8px;
-            background-color: #e9ecef;
+            background-color: rgba(233, 236, 239, 0.9);
             border-radius: 4px;
-            border: 1px solid #ced4da;
+            border: 1px solid #4682b4;
             color: #333;
             font-size: 0.9rem;
         }
@@ -120,16 +152,17 @@
         }
 
         .calendar-grid .day {
-            background-color: #f9f9f9;
+            background-color: rgba(249, 249, 249, 0.9);
+            transition: background-color 0.2s;
         }
 
         .calendar-grid .day:hover {
-            background-color: #007bff;
+            background-color: #4682b4;
             color: white;
         }
 
         .calendar-grid .selected {
-            background-color: #007bff;
+            background-color: #2e5e91;
             color: white;
             font-weight: bold;
         }
@@ -172,6 +205,10 @@
             .calendar-grid div {
                 padding: 10px;
                 font-size: 1rem;
+            }
+
+            .container::before, .calendar::before {
+                font-size: 1.5rem;
             }
         }
 
