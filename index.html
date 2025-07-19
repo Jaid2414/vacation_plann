@@ -10,20 +10,22 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            background-color: #f4f4f4;
+            /* Gradient Background */
+            background: linear-gradient(135deg, #6b9ac4 0%, #a1c4fd 100%);
+            min-height: 100vh; /* Ensure background covers full height */
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 20px;
         }
 
-        .container, .calculator {
-            background-color: #fff;
+        .container, .calendar {
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent for depth */
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Stronger shadow for contrast */
             width: 100%;
-            max-width: 500px; /* Max width for larger screens */
+            max-width: 500px;
             box-sizing: border-box;
         }
 
@@ -31,20 +33,19 @@
             text-align: center;
             color: #333;
             margin-bottom: 20px;
-            font-size: 1.5rem; /* Relative font size */
+            font-size: 1.5rem;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
-            color: #555;
+            color: #333;
             font-weight: bold;
             font-size: 0.9rem;
         }
 
         input[type="date"],
-        input[type="number"],
-        input[type="text"] {
+        input[type="number"] {
             width: calc(100% - 22px);
             padding: 8px;
             margin-bottom: 15px;
@@ -63,6 +64,7 @@
             font-size: 0.9rem;
             width: 100%;
             margin-top: 10px;
+            transition: background-color 0.3s; /* Smooth hover transition */
         }
 
         button:hover {
@@ -79,39 +81,62 @@
             font-size: 0.9rem;
         }
 
-        .calculator input[type="text"] {
-            width: calc(100% - 20px);
-            margin-bottom: 10px;
-            text-align: right;
-            font-size: 1rem;
+        /* Calendar Styles */
+        .calendar {
+            max-width: 350px;
         }
 
-        .calculator .keys {
+        .calendar-header {
             display: flex;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar-header button {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
             gap: 5px;
+            text-align: center;
         }
 
-        .calculator .keys button {
-            width: 22%;
-            padding: 12px;
-            font-size: 1rem;
-            background-color: #e0e0e0;
-            color: #333;
-            border: none;
-            border-radius: 5px;
+        .calendar-grid div {
+            padding: 8px;
+            font-size: 0.9rem;
             cursor: pointer;
-            min-width: 50px; /* Ensure touch-friendly size */
+            border-radius: 4px;
         }
 
-        .calculator .keys button.operator {
-            background-color: #ff9800;
+        .calendar-grid .day-name {
+            font-weight: bold;
+            color: #333;
+            cursor: default;
+        }
+
+        .calendar-grid .day {
+            background-color: #f9f9f9;
+        }
+
+        .calendar-grid .day:hover {
+            background-color: #007bff;
             color: white;
         }
 
-        .calculator .keys button.equal {
-            background-color: #4CAF50;
+        .calendar-grid .selected {
+            background-color: #007bff;
             color: white;
+            font-weight: bold;
+        }
+
+        .calendar-grid .disabled {
+            color: #ccc;
+            cursor: not-allowed;
         }
 
         /* Media Queries for Larger Screens */
@@ -128,7 +153,7 @@
                 padding: 20px;
             }
 
-            .calculator {
+            .calendar {
                 max-width: 300px;
                 padding: 20px;
             }
@@ -139,15 +164,14 @@
 
             input[type="date"],
             input[type="number"],
-            input[type="text"],
             button {
                 font-size: 1rem;
                 padding: 10px;
             }
 
-            .calculator .keys button {
-                padding: 15px;
-                font-size: 1.1rem;
+            .calendar-grid div {
+                padding: 10px;
+                font-size: 1rem;
             }
         }
 
@@ -156,7 +180,7 @@
                 max-width: 450px;
             }
 
-            .calculator {
+            .calendar {
                 max-width: 350px;
             }
         }
@@ -173,6 +197,7 @@
         <div>
             <label for="startLeaveDate">Start Leave Date:</label>
             <input type="date" id="startLeaveDate">
+            <button onclick="calculateAllowedVacation()">Calculate Allowed Vacation Days</button>
         </div>
         <div>
             <label>Allowed Vacation Days:</label>
@@ -190,41 +215,27 @@
             <label>Balance Vacation Days:</label>
             <span id="balanceVacationDays" class="result">0</span>
         </div>
-        <button onclick="calculateVacation()">Calculate Vacation</button>
+        <button onclick="calculateVacationDays()">Calculate Vacation Days</button>
     </div>
 
-    <div class="calculator">
-        <h2>Calculator</h2>
-        <input type="text" id="calcDisplay" readonly>
-        <div class="keys">
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button class="operator" onclick="appendToDisplay('/')">/</button>
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button class="operator" onclick="appendToDisplay('*')">*</button>
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button class="operator" onclick="appendToDisplay('-')">-</button>
-            <button onclick="appendToDisplay('0')">0</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button class="equal" onclick="calculateResult()">=</button>
-            <button class="operator" onclick="appendToDisplay('+')">+</button>
-            <button onclick="clearDisplay()">C</button>
+    <div class="calendar">
+        <h2>Calendar</h2>
+        <div class="calendar-header">
+            <button onclick="prevMonth()">Previous</button>
+            <span id="monthYear"></span>
+            <button onclick="nextMonth()">Next</button>
         </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
     <script>
-        function calculateVacation() {
+        // Vacation Planner Functions
+        function calculateAllowedVacation() {
             const joiningDateInput = document.getElementById('joiningDate').value;
             const startLeaveDateInput = document.getElementById('startLeaveDate').value;
-            const requestedVacationDays = parseInt(document.getElementById('requestedVacationDays').value);
 
-            if (!joiningDateInput || !startLeaveDateInput || isNaN(requestedVacationDays)) {
-                alert('Please fill in all the required fields.');
+            if (!joiningDateInput || !startLeaveDateInput) {
+                alert('Please fill in Joining Date and Start Leave Date.');
                 return;
             }
 
@@ -236,6 +247,19 @@
 
             const allowedDays = Math.floor((30 / 365) * daysBetween);
             document.getElementById('allowedVacationDays').textContent = allowedDays;
+        }
+
+        function calculateVacationDays() {
+            const startLeaveDateInput = document.getElementById('startLeaveDate').value;
+            const requestedVacationDays = parseInt(document.getElementById('requestedVacationDays').value);
+            const allowedVacationDays = parseInt(document.getElementById('allowedVacationDays').textContent);
+
+            if (!startLeaveDateInput || isNaN(requestedVacationDays)) {
+                alert('Please fill in Start Leave Date and Requested Vacation Days.');
+                return;
+            }
+
+            const startLeaveDate = new Date(startLeaveDateInput);
 
             let currentEndDate = new Date(startLeaveDate);
             let daysCounted = 0;
@@ -247,27 +271,87 @@
             }
             document.getElementById('endDate').textContent = currentEndDate.toDateString();
 
-            const balanceDays = allowedDays - requestedVacationDays;
-            document.getElementById('balanceVacationDays').textContent = balanceDays;
+            const balanceDays = allowedVacationDays - requestedVacationDays;
+            document.getElementById('balanceVacationDays').textContent = balanceDays >= 0 ? balanceDays : 'Insufficient vacation days';
         }
 
-        let calcDisplay = document.getElementById('calcDisplay');
+        // Calendar Functions
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
 
-        function appendToDisplay(value) {
-            calcDisplay.value += value;
-        }
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const monthYear = document.getElementById('monthYear');
+            const startLeaveDateInput = document.getElementById('startLeaveDate').value;
 
-        function clearDisplay() {
-            calcDisplay.value = '';
-        }
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-        function calculateResult() {
-            try {
-                calcDisplay.value = eval(calcDisplay.value);
-            } catch (error) {
-                calcDisplay.value = 'Error';
+            calendarGrid.innerHTML = '';
+
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day-name';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day disabled';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                dayElement.textContent = day;
+
+                const currentDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (currentDateStr === startLeaveDateInput) {
+                    dayElement.className += ' selected';
+                }
+
+                dayElement.onclick = () => {
+                    document.getElementById('startLeaveDate').value = currentDateStr;
+                    renderCalendar();
+                };
+
+                calendarGrid.appendChild(dayElement);
             }
         }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+
+        renderCalendar();
+
+        document.getElementById('startLeaveDate').addEventListener('change', () => {
+            const selectedDate = new Date(document.getElementById('startLeaveDate').value);
+            currentMonth = selectedDate.getMonth();
+            currentYear = selectedDate.getFullYear();
+            renderCalendar();
+        });
     </script>
 </body>
 
